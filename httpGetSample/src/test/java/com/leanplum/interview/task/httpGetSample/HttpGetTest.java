@@ -1,6 +1,7 @@
 package com.leanplum.interview.task.httpGetSample;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +24,9 @@ public class HttpGetTest {
 
             HttpConnectionHelper httpConnectionHelper = new HttpConnectionHelper();
             String fileName = null;
+            Double fileSize = null;
 
+            // get appropriate file name and size
             while (fileName == null || fileName.equals(NOT_DOWNLOADABLE_FILE_NAME)) {
                 Map<String, String> parameters = new HashMap<String, String>();
                 parameters.put("action", "getVars");
@@ -44,7 +47,7 @@ public class HttpGetTest {
                 SampleResponse sampleResponse = gson.fromJson(getResponse.getResponseData(), SampleResponse.class);
 
                 fileName = sampleResponse.getResponse().get(0).getVars().getFileName();
-                Double fileSize = sampleResponse.getResponse().get(0).getVars().getFileSizeBytes();
+                fileSize = sampleResponse.getResponse().get(0).getVars().getFileSizeBytes();
                 System.out.println("File name is: " + fileName);
                 System.out.println("File size is: " + fileSize);
 
@@ -61,11 +64,28 @@ public class HttpGetTest {
 
             String fileDir = new File("").getAbsolutePath() + DOWNLOAD_DIR;
 
-            String downloadedFile = httpConnectionHelper.httpGet(LEANPLUM_API_URL, null, dowloadFileParameters, fileDir,
-                    fileName);
+            String downloadedFileName = httpConnectionHelper.httpGet(LEANPLUM_API_URL, null, dowloadFileParameters,
+                    fileDir, fileName);
 
-            System.out.println("The file is downloaded at: " + downloadedFile);
-            Assert.assertNotNull(downloadedFile);
+            System.out.println("The file is downloaded at: " + downloadedFileName);
+            Assert.assertNotNull(downloadedFileName);
+
+            // gets the size of downladed file
+            File downloadedFile = new File(downloadedFileName);
+            long downloadedFileSize = downloadedFile.length();
+
+            System.out.println("downloadedFileSize:" + downloadedFileSize);
+
+            // compare both sizes
+            BigDecimal expected = new BigDecimal(fileSize);
+            BigDecimal actual = new BigDecimal(downloadedFileSize);
+            if (expected.compareTo(actual) == 0) {
+                Assert.assertTrue(true);
+            } else {
+                System.err.println("Downloaded file size is not as expected! (Expected: " + expected.toPlainString()
+                        + "; Actual: " + actual.toPlainString() + ")");
+                Assert.assertTrue(false);
+            }
 
         } catch (Exception e) {
 
