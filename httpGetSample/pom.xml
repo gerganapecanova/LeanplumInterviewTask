@@ -26,7 +26,6 @@
 	    <groupId>org.testng</groupId>
 	    <artifactId>testng</artifactId>
 	    <version>7.1.0</version>
-	    <scope>test</scope>
 	</dependency>
 	
 	<dependency>
@@ -34,6 +33,42 @@
 	    <artifactId>gson</artifactId>
 	    <version>2.8.6</version>
 	</dependency>
+
+	<dependency>
+	    <groupId>org.slf4j</groupId>
+	    <artifactId>slf4j-api</artifactId>
+	    <version>1.7.30</version>
+	</dependency>
+
+	<dependency>
+	    <groupId>org.slf4j</groupId>
+	    <artifactId>slf4j-log4j12</artifactId>
+	    <version>1.7.30</version>
+	    <scope>test</scope>
+	</dependency>
+	
+	<dependency>
+	    <groupId>log4j</groupId>
+	    <artifactId>log4j</artifactId>
+	    <version>1.2.17</version>
+	</dependency>
+		
 	    
   </dependencies>
+  
+  <build>  
+	<plugins>
+	  	<plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-surefire-plugin</artifactId>
+	        <version>3.0.0-M5</version>
+	        <configuration>
+	          <suiteXmlFiles>
+	            <suiteXmlFile>suites/suite1.xml</suiteXmlFile>
+	          </suiteXmlFiles>
+	        </configuration>
+      </plugin>
+	</plugins> 		
+  </build>
+
 </project>

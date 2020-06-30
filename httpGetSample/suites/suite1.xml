@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="Leanplum Interview Task Test suite">
+	<test name="Leanplum Interview Task Test">
+		<classes>
+			<class name="com.leanplum.interview.task.httpGetSample.HttpGetTest" />
+		</classes>	
+	</test>
+</suite>

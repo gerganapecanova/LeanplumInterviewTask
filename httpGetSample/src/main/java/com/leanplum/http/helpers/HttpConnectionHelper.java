@@ -40,32 +40,100 @@ public class HttpConnectionHelper {
         this.cookies = cookies;
     }
 
+    /**
+     * Do http PUT operation
+     * 
+     * @param url
+     *            to work on
+     * @param headers
+     *            to use in the request
+     * @param parameters
+     *            to use in the request
+     * @param data
+     *            to write, if a writable operation
+     * @return
+     * @throws IOException
+     */
     public HttpResponse httpPut(String url, Map<String, String> headers, Map<String, String> parameters, byte[] data)
-            throws Exception {
+            throws IOException {
         HttpURLConnection con = doHttp("PUT", url, headers, parameters, data);
         return retrieveHtmlResponse(con);
     }
 
+    /**
+     * Do http POST operation
+     * 
+     * @param url
+     *            to work on
+     * @param headers
+     *            to use in the request
+     * @param parameters
+     *            to use in the request
+     * @param data
+     *            to write, if a writable operation
+     * @return
+     * @throws IOException
+     */
     public HttpResponse httpPost(String url, Map<String, String> headers, Map<String, String> parameters, byte[] data)
-            throws Exception {
+            throws IOException {
         HttpURLConnection con = doHttp("POST", url, headers, parameters, data);
         return retrieveHtmlResponse(con);
     }
 
+    /**
+     * Do http DELETE operation
+     * 
+     * @param url
+     *            to work on
+     * @param headers
+     *            to use in the request
+     * @param parameters
+     *            to use in the request
+     * @return
+     * @throws IOException
+     */
     public HttpResponse httpDelete(String url, Map<String, String> headers, Map<String, String> parameters)
-            throws Exception {
+            throws IOException {
         HttpURLConnection con = doHttp("DELETE", url, headers, parameters, null);
         return retrieveHtmlResponse(con);
     }
 
+    /**
+     * Do http GET operation
+     * 
+     * @param url
+     *            to work on
+     * @param headers
+     *            to use in the request
+     * @param parameters
+     *            to use in the request
+     * @return
+     * @throws IOException
+     */
     public HttpResponse httpGet(String url, Map<String, String> headers, Map<String, String> parameters)
-            throws Exception {
+            throws IOException {
         HttpURLConnection con = doHttp("GET", url, headers, parameters, null);
         return retrieveHtmlResponse(con);
     }
 
+    /**
+     * Do http GET operation to download a file
+     * 
+     * @param url
+     *            to work on
+     * @param headers
+     *            to use in the request
+     * @param parameters
+     *            to use in the request
+     * @param saveDir
+     *            where to save the file
+     * @param fileName
+     *            how to name the file
+     * @return
+     * @throws IOException
+     */
     public String httpGet(String url, Map<String, String> headers, Map<String, String> parameters, String saveDir,
-            String fileName) throws Exception {
+            String fileName) throws IOException {
         HttpURLConnection con = doHttp("GET", url, headers, parameters, null);
         return downoadFileFromResponse(con, saveDir, fileName);
     }
@@ -75,18 +143,15 @@ public class HttpConnectionHelper {
      *            http operation: get post put delete
      * @param url
      *            to work on
-     * @param queryString
      * @param data
      *            to write, if a writable operation
      * @param headers
      *            to use in the request
-     * @param cookies
-     *            to use in the request and update from the response
      * @return http response
-     * @throws Exception
+     * @throws IOException
      */
     private HttpURLConnection doHttp(String type, String url, Map<String, String> headers,
-            Map<String, String> parameters, byte[] data) throws Exception {
+            Map<String, String> parameters, byte[] data) throws IOException {
 
         URL newUrl = null;
         try {
@@ -164,9 +229,9 @@ public class HttpConnectionHelper {
      *            that is already connected to its url with an http request, and that should contain a response for us
      *            to retrieve
      * @return a response from the server to the previously submitted http request
-     * @throws Exception
+     * @throws IOException
      */
-    private HttpResponse retrieveHtmlResponse(HttpURLConnection con) throws Exception {
+    private HttpResponse retrieveHtmlResponse(HttpURLConnection con) throws IOException {
 
         HttpResponse ret = new HttpResponse();
 
@@ -212,7 +277,7 @@ public class HttpConnectionHelper {
      * @return Returns null if don't succeed
      * @throws IOException
      */
-    public String downoadFileFromResponse(HttpURLConnection con, String saveDir, String fileName) throws IOException {
+    private String downoadFileFromResponse(HttpURLConnection con, String saveDir, String fileName) throws IOException {
         // opens input stream from the HTTP connection
         InputStream inputStream;
         try {
@@ -266,7 +331,7 @@ public class HttpConnectionHelper {
         return ret;
     }
 
-    public String getParamsString(Map<String, String> params) throws UnsupportedEncodingException {
+    private String getParamsString(Map<String, String> params) throws UnsupportedEncodingException {
         StringBuilder result = new StringBuilder();
 
         for (Map.Entry<String, String> entry : params.entrySet()) {
