@@ -1,9 +1,10 @@
 package com.leanplum.http.helpers;
 
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -176,17 +177,15 @@ public class HttpConnectionHelper {
             ret.setFailure(e);
         }
 
-        // This actually takes the data from the previously set stream
-        // (error or input) and stores it in a byte[] inside the response
-        ByteArrayOutputStream container = new ByteArrayOutputStream();
-
-        byte[] buf = new byte[1024];
-        int read;
-        while ((read = inputStream.read(buf, 0, 1024)) > 0) {
-            container.write(buf, 0, read);
+        StringBuilder resultData = new StringBuilder();
+        BufferedReader rd = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String line; // reading the lines into the result
+        while ((line = rd.readLine()) != null) {
+            resultData.append(line);
         }
+        rd.close();
 
-        ret.setResponseData(container.toByteArray());
+        ret.setResponseData(resultData.toString());
 
         return ret;
     }

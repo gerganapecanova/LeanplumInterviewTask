@@ -5,7 +5,7 @@ import java.util.Map;
 public class HttpResponse {
     private static final int OK_STATUS_CODE = 200;
     private Map<String, ? extends Iterable<String>> responseHeaders = null;
-    protected byte[] responseData = null;
+    protected String responseData = null;
     private Exception failure = null;
     private int statusCode = 0;
 
@@ -14,7 +14,7 @@ public class HttpResponse {
      * @param responseData
      * @param failure
      */
-    public HttpResponse(Map<String, Iterable<String>> responseHeaders, byte[] responseData, Exception failure,
+    public HttpResponse(Map<String, Iterable<String>> responseHeaders, String responseData, Exception failure,
             int statusCode) {
         super();
         this.responseHeaders = responseHeaders;
@@ -44,7 +44,7 @@ public class HttpResponse {
     /**
      * @return the response Data
      */
-    public byte[] getResponseData() {
+    public String getResponseData() {
         return responseData;
     }
 
@@ -52,7 +52,7 @@ public class HttpResponse {
      * @param responseData
      *            the responseData to set
      */
-    public void setResponseData(byte[] responseData) {
+    public void setResponseData(String responseData) {
         this.responseData = responseData;
     }
 
