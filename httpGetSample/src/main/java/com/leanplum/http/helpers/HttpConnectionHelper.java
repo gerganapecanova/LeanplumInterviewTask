@@ -2,6 +2,8 @@ package com.leanplum.http.helpers;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,6 +18,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 public class HttpConnectionHelper {
+    private static final int BUFFER_SIZE = 4096;
 
     private Map<String, String> cookies;
 
@@ -39,22 +42,32 @@ public class HttpConnectionHelper {
 
     public HttpResponse httpPut(String url, Map<String, String> headers, Map<String, String> parameters, byte[] data)
             throws Exception {
-        return doHttp("PUT", url, headers, parameters, data);
+        HttpURLConnection con = doHttp("PUT", url, headers, parameters, data);
+        return retrieveHtmlResponse(con);
     }
 
     public HttpResponse httpPost(String url, Map<String, String> headers, Map<String, String> parameters, byte[] data)
             throws Exception {
-        return doHttp("POST", url, headers, parameters, data);
+        HttpURLConnection con = doHttp("POST", url, headers, parameters, data);
+        return retrieveHtmlResponse(con);
     }
 
     public HttpResponse httpDelete(String url, Map<String, String> headers, Map<String, String> parameters)
             throws Exception {
-        return doHttp("DELETE", url, headers, parameters, null);
+        HttpURLConnection con = doHttp("DELETE", url, headers, parameters, null);
+        return retrieveHtmlResponse(con);
     }
 
     public HttpResponse httpGet(String url, Map<String, String> headers, Map<String, String> parameters)
             throws Exception {
-        return doHttp("GET", url, headers, parameters, null);
+        HttpURLConnection con = doHttp("GET", url, headers, parameters, null);
+        return retrieveHtmlResponse(con);
+    }
+
+    public String httpGet(String url, Map<String, String> headers, Map<String, String> parameters, String saveDir,
+            String fileName) throws Exception {
+        HttpURLConnection con = doHttp("GET", url, headers, parameters, null);
+        return downoadFileFromResponse(con, saveDir, fileName);
     }
 
     /**
@@ -72,8 +85,8 @@ public class HttpConnectionHelper {
      * @return http response
      * @throws Exception
      */
-    private HttpResponse doHttp(String type, String url, Map<String, String> headers, Map<String, String> parameters,
-            byte[] data) throws Exception {
+    private HttpURLConnection doHttp(String type, String url, Map<String, String> headers,
+            Map<String, String> parameters, byte[] data) throws Exception {
 
         URL newUrl = null;
         try {
@@ -86,8 +99,8 @@ public class HttpConnectionHelper {
             prepareHttpRequest(con, headers, parameters, data, cookieString);
 
             con.connect();
-            HttpResponse ret = retrieveHtmlResponse(con);
-            return ret;
+
+            return con;
         } catch (MalformedURLException e) {
             return null;
         }
@@ -188,6 +201,53 @@ public class HttpConnectionHelper {
         ret.setResponseData(resultData.toString());
 
         return ret;
+    }
+
+    /**
+     * Download a file.
+     * 
+     * @param con
+     * @param saveDir
+     * @param fileName
+     * @return Returns null if don't succeed
+     * @throws IOException
+     */
+    public String downoadFileFromResponse(HttpURLConnection con, String saveDir, String fileName) throws IOException {
+        // opens input stream from the HTTP connection
+        InputStream inputStream;
+        try {
+            inputStream = con.getInputStream();
+        } catch (Exception e) {
+
+            inputStream = con.getErrorStream();
+            StringBuilder resultData = new StringBuilder();
+            BufferedReader rd = new BufferedReader(new InputStreamReader(inputStream));
+            String line; // reading the lines into the result
+            while ((line = rd.readLine()) != null) {
+                resultData.append(line);
+            }
+            rd.close();
+
+            System.err.println("Failed to open input stream:");
+            System.err.println(resultData.toString());
+
+            return null;
+        }
+
+        String saveFilePath = saveDir + File.separator + fileName;
+        // opens an output stream to save into file
+        FileOutputStream outputStream = new FileOutputStream(saveFilePath);
+
+        int bytesRead = -1;
+        byte[] buffer = new byte[BUFFER_SIZE];
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, bytesRead);
+        }
+
+        outputStream.close();
+        inputStream.close();
+
+        return saveFilePath;
     }
 
     public String getCookieString() {
